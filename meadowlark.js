@@ -59,7 +59,13 @@ app.get('/thank-you',function(req,res){
 app.post('/post',function(req,res){
 	console.log('Received contact from ' + req.body.name + ' <'+req.body.email+'>');
 	//保存到数据库...
-	res.send('thinks');
+	//res.send('thinks');
+	//返回json
+	var jsonstr = [
+		{'a':1,'b':2},
+		{'c':3,'d':4}
+	];
+	res.json(jsonstr);
 });
 
 //文件上传处理
@@ -82,6 +88,37 @@ app.post('/contest/vacation-photo/:year/:month',function(req,res){
 		res.redirect(303,'/thank-you');
 	});
 })
+
+//返回xml json text
+app.get('/api/tours',function(req,res){
+	var toursXml = '<?xml version="1.0"? ><tours>' +
+		products.map(function(p){
+			return '<tour price="'+p.price +
+				'" id="' + p.id + '">' + p.name + '</tour>';
+		}).join('') + '</tours>';
+		
+		var toursText = tours.map(function(){
+			return p.id + ': ' + p.name + ' (' + p.price + ')';
+		}).join('\n');
+		
+		res.format({
+				'application/json' : function(){
+					res.json(tours);
+				},
+				'application/xml' : function(){
+					res.type('application/xml');
+					res.send(toursXml);
+				},
+				'text/xml' : function() {
+					res.type('text/xml');
+					res.send(toursXml);
+				},
+				'text/plain' : funciton(){
+					res.type('text/plain');
+					res.send(toursXml);
+				}
+			});
+});
 
 // 404 catch-all handler (middleware)
 app.use(function(req, res, next){
